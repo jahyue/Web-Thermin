@@ -34,15 +34,14 @@ thereminCanvas.addEventListener('pointermove', async (event) => {
     gainNode.connect(audioCtx.destination);
     gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
     
-  }else {
-    if (is_playing) {
+  }
+});
+thereminCanvas.addEventListener('pointerleave', () => {
+  if (is_playing) {
       gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
       oscillator.stop(audioCtx.currentTime + 0.1);
       oscillator.disconnect();
       oscillator = null;
       is_playing = false;
       is_touchingCanvas = false;
-    }
-    
-  }
-});
+    }});
