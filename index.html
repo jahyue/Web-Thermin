@@ -10,7 +10,13 @@
 <body>
     <h1>Web Thermin</h1>
     <canvas id="thereminCanvas" width="800" height="400"></canvas>
-    
+    <label for="waveformSelect">Waveform:</label>
+    <select id="waveformSelect">
+        <option value="sine">Sine</option>
+        <option value="square">Square</option>
+        <option value="sawtooth">Sawtooth</option>
+        <option value="triangle">Triangle</option>
+    </select>
     <div id="notetext" style="width: 200px; height: 100px;">
         Note: <span id="noteDisplay">None</span>
     </div>

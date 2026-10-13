@@ -2,13 +2,18 @@
 const thereminCanvas = document.getElementById('thereminCanvas');
 const canvasContext = thereminCanvas.getContext('2d');
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-noteDisplay = document.getElementById('noteDisplay');
-
+const noteDisplay = document.getElementById('noteDisplay');
+const waveformSelect = document.getElementById('waveformSelect');
 const gainNode = audioCtx.createGain();
 
 let is_playing = false;
 let oscillator = null;
-getnote = (frequency) => {
+waveformSelect.addEventListener('change', () => {
+  if (oscillator) {
+    oscillator.type = waveformSelect.value;
+  }
+});
+const getnote = (frequency) => {
   const notes = [
     "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
   ];
@@ -39,7 +44,7 @@ thereminCanvas.addEventListener('pointermove', async (event) => {
       oscillator = audioCtx.createOscillator();
       
       oscillator.connect(gainNode);
-      oscillator.type = 'sawtooth';
+      oscillator.type = waveformSelect.value;
       oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
       oscillator.start(); 
      
