@@ -2,12 +2,28 @@
 const thereminCanvas = document.getElementById('thereminCanvas');
 const canvasContext = thereminCanvas.getContext('2d');
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
+noteDisplay = document.getElementById('noteDisplay');
 
 const gainNode = audioCtx.createGain();
 
 let is_playing = false;
 let oscillator = null;
+getnote = (frequency) => {
+  const noteFrequencies = [
+    { note: 'C4', frequency: 261.63 },
+    { note: 'D4', frequency: 293.66 },
+    { note: 'E4', frequency: 329.63 },
+    { note: 'F4', frequency: 349.23 },
+    { note: 'G4', frequency: 392.00 },
+    { note: 'A4', frequency: 440.00 },
+    { note: 'B4', frequency: 493.88 },
+    { note: 'C5', frequency: 523.25 },
+  ];
+  const closestNote = noteFrequencies.reduce((prev, curr) => {
+    return Math.abs(curr.frequency - frequency) < Math.abs(prev.frequency - frequency) ? curr : prev;
+  });
+  return closestNote.note;
+};
 thereminCanvas.addEventListener('pointermove', async (event) => {
   const rect = thereminCanvas.getBoundingClientRect();
   const x = event.clientX - rect.left;
@@ -19,21 +35,24 @@ thereminCanvas.addEventListener('pointermove', async (event) => {
     const frequency = 440 + (y / rect.height) * 880;
 
     const volume = 1 - (x / rect.width);
+    console.log(`Frequency: ${frequency}, Volume: ${volume}`);
     if (!is_playing) {
       await audioCtx.resume();
       is_playing = true;
       oscillator = audioCtx.createOscillator();
       
       oscillator.connect(gainNode);
-      oscillator.type = 'sine';
+      oscillator.type = 'sawtooth';
       oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
       oscillator.start(); 
+     
     }
     
     oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
     gainNode.connect(audioCtx.destination);
     gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
-    
+    console.log("Note:" + getnote(frequency));
+     noteDisplay.textContent = getnote(frequency);
   }
 });
 thereminCanvas.addEventListener('pointerleave', () => {
