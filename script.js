@@ -9,22 +9,17 @@ const gainNode = audioCtx.createGain();
 let is_playing = false;
 let oscillator = null;
 getnote = (frequency) => {
-  const noteFrequencies = [
-    { note: 'C4', frequency: 261.63 },
-    { note: 'D4', frequency: 293.66 },
-    { note: 'E4', frequency: 329.63 },
-    { note: 'F4', frequency: 349.23 },
-    { note: 'G4', frequency: 392.00 },
-    { note: 'A4', frequency: 440.00 },
-    { note: 'B4', frequency: 493.88 },
-    { note: 'C5', frequency: 523.25 },
+  const notes = [
+    "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
   ];
-  const closestNote = noteFrequencies.reduce((prev, curr) => {
-    return Math.abs(curr.frequency - frequency) < Math.abs(prev.frequency - frequency) ? curr : prev;
-  });
-  return closestNote.note;
+  const midiNumber = 69 + 12 * Math.log2(frequency / 440);
+  const noteName = notes[Math.round(midiNumber) % 12];
+  const octave = Math.floor(Math.round(midiNumber) / 12) - 1;
+  
+  return noteName + octave;
 };
 thereminCanvas.addEventListener('pointermove', async (event) => {
+  const clampedY = Math.max(0, Math.min(thereminCanvas.height, event.clientY - thereminCanvas.getBoundingClientRect().top));
   const rect = thereminCanvas.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
@@ -32,7 +27,9 @@ thereminCanvas.addEventListener('pointermove', async (event) => {
   if (isTouchingCanvas) {
     canvasContext.clearRect(0, 0, rect.width, rect.height);
 
-    const frequency = 440 + (y / rect.height) * 880;
+    const minFrequency = 65.41; // C2
+    const maxFrequency = 1046.50; // C6
+    const frequency = minFrequency * Math.pow(maxFrequency / minFrequency, 1- clampedY / thereminCanvas.height);
 
     const volume = 1 - (x / rect.width);
     console.log(`Frequency: ${frequency}, Volume: ${volume}`);
@@ -52,7 +49,7 @@ thereminCanvas.addEventListener('pointermove', async (event) => {
     gainNode.connect(audioCtx.destination);
     gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
     console.log("Note:" + getnote(frequency));
-     noteDisplay.textContent = getnote(frequency);
+    noteDisplay.textContent = getnote(frequency);
   }
 });
 thereminCanvas.addEventListener('pointerleave', () => {
