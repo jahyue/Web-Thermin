@@ -5,7 +5,7 @@ const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 const noteDisplay = document.getElementById('noteDisplay');
 const waveformSelect = document.getElementById('waveformSelect');
 const gainNode = audioCtx.createGain();
-
+const analyser = audioCtx.createAnalyser();
 let is_playing = false;
 let oscillator = null;
 waveformSelect.addEventListener('change', () => {
