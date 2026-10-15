@@ -101,12 +101,12 @@ thereminCanvas.addEventListener('pointermove', async (event) => {
       oscillator = audioCtx.createOscillator();
       oscillator.connect(gainNode);
       oscillator.type = waveformSelect.value;
-      oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
+      oscillator.frequency.setTargetAtTime(440, audioCtx.currentTime, 0.1);
       oscillator.start(); 
     }
     
-    oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-    gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
+    oscillator.frequency.setTargetAtTime(frequency, audioCtx.currentTime, 0.1);
+    gainNode.gain.setTargetAtTime(volume, audioCtx.currentTime, 0.1);
     
     frequencyText.textContent = frequency.toFixed(2) + " Hz";
     volumeText.textContent = (volume * 100).toFixed(2) + "%";
