@@ -78,6 +78,11 @@ const getnote = (frequency) => {
 };
 
 thereminCanvas.addEventListener('pointermove', async (event) => {
+  // 1. Ensure audio context is active before doing anything else
+  if (audioCtx.state === 'suspended') {
+    await audioCtx.resume();
+  }
+
   const rect = thereminCanvas.getBoundingClientRect();
   const clampedY = Math.max(0, Math.min(thereminCanvas.height, event.clientY - rect.top));
   const x = event.clientX - rect.left;
@@ -96,24 +101,29 @@ thereminCanvas.addEventListener('pointermove', async (event) => {
     const volume = 1 - (x / rect.width);
 
     if (!is_playing) {
-      await audioCtx.resume();
       is_playing = true;
+      
+      if (oscillator) {
+        try { oscillator.stop(); oscillator.disconnect(); } catch (e) {}
+      }
+
       oscillator = audioCtx.createOscillator();
       oscillator.connect(gainNode);
       oscillator.type = waveformSelect.value;
-      oscillator.frequency.setTargetAtTime(440, audioCtx.currentTime, 0.1);
+      oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
       oscillator.start(); 
     }
     
-    oscillator.frequency.setTargetAtTime(frequency, audioCtx.currentTime, 0.1);
-    gainNode.gain.setTargetAtTime(volume, audioCtx.currentTime, 0.1);
+    // 2. Use setTargetAtTime instead of setValueAtTime to completely eliminate crackling/popping
+    const now = audioCtx.currentTime;
+    oscillator.frequency.setTargetAtTime(frequency, now, 0.015);
+    gainNode.gain.setTargetAtTime(volume, now, 0.015);
     
     frequencyText.textContent = frequency.toFixed(2) + " Hz";
     volumeText.textContent = (volume * 100).toFixed(2) + "%";
     note.textContent = getnote(frequency);
   }
 });
-
 thereminCanvas.addEventListener('pointerleave', () => {
   if (is_playing) {
     gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
