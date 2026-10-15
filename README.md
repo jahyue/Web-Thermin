@@ -15,3 +15,4 @@ An interactive, browser-based musical instrument and real-time audio visualizer 
 * **Multi-Waveform:** Switch instantly between four oscillator types: **Sine**, **Square**, **Sawtooth**, and **Triangle**.
 * **Musical Feedback:** Displays the active musical note (e.g., *A4*), exact frequency in Hertz, and current volume percentage.
 
+https://jahyue.github.io/Web-Thermin/
