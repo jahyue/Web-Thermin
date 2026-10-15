@@ -15,22 +15,42 @@ gainNode.connect(audioCtx.destination);
 let stopTimeout = null;
 let is_playing = false;
 let oscillator = null;
+let scrolloffset = 0;
 function animate() {
+   requestAnimationFrame(animate);
   canvasContext.clearRect(0, 0, thereminCanvas.width, thereminCanvas.height);
-  requestAnimationFrame(animate);
-  
-  analyser.getByteTimeDomainData(dataArray);
+  if (analyser) {
+    analyser.getByteTimeDomainData(dataArray);
+    scrolloffset = (scrolloffset + 1) % bufferLength;
+  }else {
+    dataArray.fill(128);
+  }
+
   canvasContext.beginPath();
-  canvasContext.moveTo(0, dataArray[0] / 128 * (thereminCanvas.height / 2));
-  dataArray.forEach((value, index) => {
-    const x = (index / bufferLength) * thereminCanvas.width;
-    const y = (value / 128) * (thereminCanvas.height / 2);
-    
-    canvasContext.lineTo(x, y);
-  });
-  canvasContext.stroke();
   canvasContext.lineWidth = 2;
   canvasContext.strokeStyle = 'black';
+  let startIndex = 0;
+   
+    for (let i = 0; i < bufferLength/2; i++) {
+      if (dataArray[i] < 128 && dataArray[i + 1] >= 128 ) {
+        startIndex = i; 
+        break;
+      }
+    }
+    const drawLength = bufferLength/2;
+    for (let i = 0; i < drawLength; i++) {
+      const dataIndex = (startIndex + i - Math.floor(scrolloffset) + bufferLength) % bufferLength;
+      const x = (i / drawLength) * thereminCanvas.width;
+      const y = (dataArray[dataIndex] / 128) * thereminCanvas.height / 2;
+      if (i === 0) {
+        canvasContext.moveTo(x, y);
+      } else {
+        canvasContext.lineTo(x, y);
+      }
+    }
+  
+  canvasContext.stroke();
+
     
 }
 animate();
