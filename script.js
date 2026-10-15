@@ -6,7 +6,7 @@ const noteDisplay = document.getElementById('noteDisplay');
 const waveformSelect = document.getElementById('waveformSelect');
 const gainNode = audioCtx.createGain();
 const analyser = audioCtx.createAnalyser();
-
+const frequencyDisplay = document.getElementById('frequencyDisplay');
 analyser.fftSize = 2048;
 const bufferLength = analyser.frequencyBinCount;
 const dataArray = new Uint8Array(bufferLength);
@@ -24,15 +24,13 @@ function animate() {
   dataArray.forEach((value, index) => {
     const x = (index / bufferLength) * thereminCanvas.width;
     const y = (value / 128) * (thereminCanvas.height / 2);
-  
-
     
     canvasContext.lineTo(x, y);
-    canvasContext.lineWidth = 2;
-    canvasContext.strokeStyle = 'black';
-    
   });
   canvasContext.stroke();
+  canvasContext.lineWidth = 2;
+  canvasContext.strokeStyle = 'black';
+    
 }
 waveformSelect.addEventListener('change', () => {
   if (oscillator) {
@@ -79,16 +77,21 @@ thereminCanvas.addEventListener('pointermove', async (event) => {
     oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
     gainNode.connect(audioCtx.destination);
     gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
-    console.log("Note:" + getnote(frequency));
+    frequencyDisplay.textContent = frequency.toFixed(2) + " Hz";
     noteDisplay.textContent = getnote(frequency);
   }
 });
 thereminCanvas.addEventListener('pointerleave', () => {
   if (is_playing) {
-      gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-      oscillator.stop(audioCtx.currentTime + 0.1);
-      oscillator.disconnect();
-      oscillator = null;
+      gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
+      timeout(() => {
+        if(oscillator) {
+          oscillator.stop();
+          oscillator.disconnect();
+          oscillator = null;
+        }
+      }, 100)
       is_playing = false;
-      
+      noteDisplay.textContent = "None";
+      frequencyDisplay.textContent = "None";  
     }});
