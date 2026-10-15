@@ -10,8 +10,9 @@ const frequencyDisplay = document.getElementById('frequencyDisplay');
 analyser.fftSize = 2048;
 const bufferLength = analyser.frequencyBinCount;
 const dataArray = new Uint8Array(bufferLength);
-
-
+gainNode.connect(analyser);
+gainNode.connect(audioCtx.destination);
+let stopTimeout = null;
 let is_playing = false;
 let oscillator = null;
 function animate() {
@@ -32,6 +33,7 @@ function animate() {
   canvasContext.strokeStyle = 'black';
     
 }
+animate();
 waveformSelect.addEventListener('change', () => {
   if (oscillator) {
     oscillator.type = waveformSelect.value;
@@ -53,6 +55,10 @@ thereminCanvas.addEventListener('pointermove', async (event) => {
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
   const isTouchingCanvas = x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
+  if (stopTimeout) {
+    clearTimeout(stopTimeout);
+    stopTimeout = null;
+  }
   if (isTouchingCanvas) {
 
     const minFrequency = 65.41; // C2
@@ -67,31 +73,37 @@ thereminCanvas.addEventListener('pointermove', async (event) => {
       oscillator = audioCtx.createOscillator();
       
       oscillator.connect(gainNode);
-      gainNode.connect(analyser);
+      
       oscillator.type = waveformSelect.value;
       oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
       oscillator.start(); 
-      animate();
     }
     
     oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-    gainNode.connect(audioCtx.destination);
+    
     gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
     frequencyText.textContent = frequency.toFixed(2) + " Hz";
+    volumeText.textContent = (volume * 100).toFixed(2) + "%";
     note.textContent = getnote(frequency);
   }
 });
 thereminCanvas.addEventListener('pointerleave', () => {
   if (is_playing) {
       gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
-      timeout(() => {
+      setTimeout(() => {
         if(oscillator) {
-          oscillator.stop();
-          oscillator.disconnect();
+          try {
+            oscillator.stop();
+            oscillator.disconnect();
+          } catch (e) {
+            console.error("Error stopping oscillator:", e);
+          }
           oscillator = null;
         }
-      }, 100)
-      is_playing = false;
-      note.textContent = "None";
-      frequencyText.textContent = "None";  
+        is_playing = false;
+      if (note) note.textContent = "None";
+      if (frequencyText) frequencyText.textContent = "None"; 
+      if (volumeText) volumeText.textContent = "0%";
+      }, 50)
+      
     }});

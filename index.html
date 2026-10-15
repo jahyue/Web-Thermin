@@ -3,13 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Thermin</title>
+    <title>Web Theremin</title>
     
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>Web Thermin</h1>
     <canvas id="thereminCanvas" width="800" height="400"></canvas>
+    <div id="container">
+    <div id="noteDisplay" style="width: 200px; height: 20px;">
+        Note: <span id="note">None</span>
+    </div>
+    <div id="frequencyDisplay" style="width: 200px; height: 20px;">
+        Frequency: <span id="frequencyText">None</span>
+    </div>
+    <div id="volumeDisplay" style="width: 200px; height: 20px;">
+        Volume: <span id="volumeText">None</span>
+    </div>
+    <div id="controls">
     <label for="waveformSelect">Waveform:</label>
     <select id="waveformSelect">
         <option value="sine">Sine</option>
@@ -17,11 +28,7 @@
         <option value="sawtooth">Sawtooth</option>
         <option value="triangle">Triangle</option>
     </select>
-    <div id="noteDisplay" style="width: 200px; height: 20px;">
-        Note: <span id="note">None</span>
     </div>
-    <div id="frequencyDisplay" style="width: 200px; height: 20px;">
-        Frequency: <span id="frequencyText">None</span>
     </div>
     <script src="script.js"></script>
 </body>

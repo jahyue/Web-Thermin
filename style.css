@@ -5,20 +5,21 @@
   padding: 20px;
   border: 2px solid black;
 }
-#noteDisplay {
+#container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+#noteDisplay, #frequencyDisplay, #volumeDisplay,#controls {
   background-color: #f0f0f0;
   font-family: Arial, sans-serif;
   color: #333;
   padding: 20px;
   border: 2px solid black;
 }
-#frequencyDisplay {
-  background-color: #f0f0f0;
-  font-family: Arial, sans-serif;
-  color: #333;
-  padding: 20px;
-  border: 2px solid black;
-}
+
 body {
   display: flex;
   flex-direction: column;
