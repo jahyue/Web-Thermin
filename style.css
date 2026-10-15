@@ -5,7 +5,14 @@
   padding: 20px;
   border: 2px solid black;
 }
-#notetext {
+#noteDisplay {
+  background-color: #f0f0f0;
+  font-family: Arial, sans-serif;
+  color: #333;
+  padding: 20px;
+  border: 2px solid black;
+}
+#frequencyDisplay {
   background-color: #f0f0f0;
   font-family: Arial, sans-serif;
   color: #333;

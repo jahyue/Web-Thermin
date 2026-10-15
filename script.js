@@ -77,8 +77,8 @@ thereminCanvas.addEventListener('pointermove', async (event) => {
     oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
     gainNode.connect(audioCtx.destination);
     gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
-    frequencyDisplay.textContent = frequency.toFixed(2) + " Hz";
-    noteDisplay.textContent = getnote(frequency);
+    frequencyText.textContent = frequency.toFixed(2) + " Hz";
+    note.textContent = getnote(frequency);
   }
 });
 thereminCanvas.addEventListener('pointerleave', () => {
@@ -92,6 +92,6 @@ thereminCanvas.addEventListener('pointerleave', () => {
         }
       }, 100)
       is_playing = false;
-      noteDisplay.textContent = "None";
-      frequencyDisplay.textContent = "None";  
+      note.textContent = "None";
+      frequencyText.textContent = "None";  
     }});
