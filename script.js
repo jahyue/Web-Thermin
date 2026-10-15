@@ -6,8 +6,34 @@ const noteDisplay = document.getElementById('noteDisplay');
 const waveformSelect = document.getElementById('waveformSelect');
 const gainNode = audioCtx.createGain();
 const analyser = audioCtx.createAnalyser();
+
+analyser.fftSize = 2048;
+const bufferLength = analyser.frequencyBinCount;
+const dataArray = new Uint8Array(bufferLength);
+
+
 let is_playing = false;
 let oscillator = null;
+function animate() {
+  canvasContext.clearRect(0, 0, thereminCanvas.width, thereminCanvas.height);
+  requestAnimationFrame(animate);
+  
+  analyser.getByteTimeDomainData(dataArray);
+  canvasContext.beginPath();
+  canvasContext.moveTo(0, dataArray[0] / 128 * (thereminCanvas.height / 2));
+  dataArray.forEach((value, index) => {
+    const x = (index / bufferLength) * thereminCanvas.width;
+    const y = (value / 128) * (thereminCanvas.height / 2);
+  
+
+    
+    canvasContext.lineTo(x, y);
+    canvasContext.lineWidth = 2;
+    canvasContext.strokeStyle = 'black';
+    
+  });
+  canvasContext.stroke();
+}
 waveformSelect.addEventListener('change', () => {
   if (oscillator) {
     oscillator.type = waveformSelect.value;
@@ -30,7 +56,6 @@ thereminCanvas.addEventListener('pointermove', async (event) => {
   const y = event.clientY - rect.top;
   const isTouchingCanvas = x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
   if (isTouchingCanvas) {
-    canvasContext.clearRect(0, 0, rect.width, rect.height);
 
     const minFrequency = 65.41; // C2
     const maxFrequency = 1046.50; // C6
@@ -44,10 +69,11 @@ thereminCanvas.addEventListener('pointermove', async (event) => {
       oscillator = audioCtx.createOscillator();
       
       oscillator.connect(gainNode);
+      gainNode.connect(analyser);
       oscillator.type = waveformSelect.value;
       oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
       oscillator.start(); 
-     
+      animate();
     }
     
     oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
@@ -64,5 +90,5 @@ thereminCanvas.addEventListener('pointerleave', () => {
       oscillator.disconnect();
       oscillator = null;
       is_playing = false;
-      is_touchingCanvas = false;
+      
     }});
