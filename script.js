@@ -19,7 +19,7 @@ let scrolloffset = 0;
 function animate() {
    requestAnimationFrame(animate);
   canvasContext.clearRect(0, 0, thereminCanvas.width, thereminCanvas.height);
-  if (analyser) {
+  if (analyser && is_playing) {
     analyser.getByteTimeDomainData(dataArray);
     scrolloffset = (scrolloffset + 1) % bufferLength;
   }else {
